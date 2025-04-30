@@ -21,6 +21,7 @@ typedef BodyContainerBuilder = Widget Function(
 
 class ScrollableListTabScroller extends StatefulWidget {
   ScrollableListTabScroller({
+    this.onNotification,
     required this.itemCount,
     required this.itemBuilder,
     required this.tabBuilder,
@@ -55,6 +56,7 @@ class ScrollableListTabScroller extends StatefulWidget {
         headerContainerProps = HeaderContainerProps();
 
   const ScrollableListTabScroller.defaultComponents({
+    this.onNotification,
     this.headerContainerProps = const HeaderContainerProps(),
     this.tabBarProps = const TabBarProps(),
     required this.itemCount,
@@ -82,7 +84,10 @@ class ScrollableListTabScroller extends StatefulWidget {
     this.scrollOffsetListener,
   }) : headerContainerBuilder = null;
 
-  final int itemCount;
+    
+
+  final Function(T)? onNotification ; 
+    
   final IndexedWidgetBuilder itemBuilder;
   final IndexedActiveStatusWidgetBuilder tabBuilder;
   final HeaderContainerBuilder? headerContainerBuilder;
@@ -304,7 +309,9 @@ class ScrollableListTabScrollerState extends State<ScrollableListTabScroller> {
             tabBarProps: widget.tabBarProps,
           ),
         ),
-        buildCustomBodyContainerOrDefault(
+        NotificationListener<ScrollNotification>(
+            onNotification: widget.onNotification,
+            child: buildCustomBodyContainerOrDefault(
           context: context,
           child: Builder(builder: (context) {
             WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -339,7 +346,8 @@ class ScrollableListTabScrollerState extends State<ScrollableListTabScroller> {
               ),
             );
           }),
-        )
+        ),
+        ),
       ],
     );
   }
