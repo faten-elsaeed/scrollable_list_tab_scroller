@@ -7,7 +7,9 @@ import 'package:scrolls_to_top/scrolls_to_top.dart';
 export 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 part "header_container_props.dart";
+
 part "tab_bar_props.dart";
+
 part "body_container_props.dart";
 
 typedef IndexedActiveStatusWidgetBuilder = Widget Function(
@@ -21,7 +23,6 @@ typedef BodyContainerBuilder = Widget Function(
 
 class ScrollableListTabScroller extends StatefulWidget {
   ScrollableListTabScroller({
-    this.onNotification,
     required this.itemCount,
     required this.itemBuilder,
     required this.tabBuilder,
@@ -48,6 +49,7 @@ class ScrollableListTabScroller extends StatefulWidget {
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
     this.scrollOffsetController,
+    this.onNotification,
     this.scrollOffsetListener,
     @Deprecated(
         "Use 'ScrollableListTabScroller.defaultComponents(tabBarProps: )' instead. Deprecated since >3.0.1")
@@ -56,7 +58,6 @@ class ScrollableListTabScroller extends StatefulWidget {
         headerContainerProps = HeaderContainerProps();
 
   const ScrollableListTabScroller.defaultComponents({
-    this.onNotification,
     this.headerContainerProps = const HeaderContainerProps(),
     this.tabBarProps = const TabBarProps(),
     required this.itemCount,
@@ -82,12 +83,10 @@ class ScrollableListTabScroller extends StatefulWidget {
     this.minCacheExtent,
     this.scrollOffsetController,
     this.scrollOffsetListener,
+    this.onNotification,
   }) : headerContainerBuilder = null;
-
-    
-
-  final Function(T)? onNotification ; 
-    
+  final bool Function(ScrollNotification)? onNotification;
+  final int itemCount;
   final IndexedWidgetBuilder itemBuilder;
   final IndexedActiveStatusWidgetBuilder tabBuilder;
   final HeaderContainerBuilder? headerContainerBuilder;
@@ -309,45 +308,45 @@ class ScrollableListTabScrollerState extends State<ScrollableListTabScroller> {
             tabBarProps: widget.tabBarProps,
           ),
         ),
-        NotificationListener<ScrollNotification>(
-            onNotification: widget.onNotification,
-            child: buildCustomBodyContainerOrDefault(
+        buildCustomBodyContainerOrDefault(
           context: context,
-          child: Builder(builder: (context) {
-            WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-              final size = context.size;
-              if (size != null) {
-                _currentPositionedListSize = size;
-              }
-            });
-            return ScrollsToTop(
-              onScrollsToTop: _onScrollsToTop,
-              child: ScrollablePositionedList.builder(
-                itemBuilder: (a, b) {
-                  return widget.itemBuilder(a, b);
-                },
-                itemCount: widget.itemCount,
-                itemScrollController: itemScrollController,
-                itemPositionsListener: itemPositionsListener,
-                shrinkWrap: widget.shrinkWrap,
-                initialScrollIndex: widget.initialScrollIndex,
-                initialAlignment: widget.initialAlignment,
-                scrollDirection: widget.scrollDirection,
-                reverse: widget.reverse,
-                physics: widget.physics,
-                semanticChildCount: widget.semanticChildCount,
-                padding: widget.padding,
-                addSemanticIndexes: widget.addSemanticIndexes,
-                addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
-                addRepaintBoundaries: widget.addRepaintBoundaries,
-                minCacheExtent: widget.minCacheExtent,
-                scrollOffsetController: widget.scrollOffsetController,
-                scrollOffsetListener: widget.scrollOffsetListener,
-              ),
-            );
-          }),
-        ),
-        ),
+          child: NotificationListener<ScrollNotification>(
+            onNotification: widget.onNotification,
+            child: Builder(builder: (context) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                final size = context.size;
+                if (size != null) {
+                  _currentPositionedListSize = size;
+                }
+              });
+              return ScrollsToTop(
+                onScrollsToTop: _onScrollsToTop,
+                child: ScrollablePositionedList.builder(
+                  itemBuilder: (a, b) {
+                    return widget.itemBuilder(a, b);
+                  },
+                  itemCount: widget.itemCount,
+                  itemScrollController: itemScrollController,
+                  itemPositionsListener: itemPositionsListener,
+                  shrinkWrap: widget.shrinkWrap,
+                  initialScrollIndex: widget.initialScrollIndex,
+                  initialAlignment: widget.initialAlignment,
+                  scrollDirection: widget.scrollDirection,
+                  reverse: widget.reverse,
+                  physics: widget.physics,
+                  semanticChildCount: widget.semanticChildCount,
+                  padding: widget.padding,
+                  addSemanticIndexes: widget.addSemanticIndexes,
+                  addAutomaticKeepAlives: widget.addAutomaticKeepAlives,
+                  addRepaintBoundaries: widget.addRepaintBoundaries,
+                  minCacheExtent: widget.minCacheExtent,
+                  scrollOffsetController: widget.scrollOffsetController,
+                  scrollOffsetListener: widget.scrollOffsetListener,
+                ),
+              );
+            }),
+          ),
+        )
       ],
     );
   }
